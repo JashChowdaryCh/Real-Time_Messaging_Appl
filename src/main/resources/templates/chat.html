@@ -2,76 +2,264 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Real-Time Messaging Application</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <title>Real-Time Chat App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.1/stomp.min.js"></script>
+    <style>
+        body {
+          font-family: 'Roboto', sans-serif;
+          background-color: #000;
+          color: #e0e0e0;
+          padding: 20px;
+          text-align: center;
+        }
+
+        h1 {
+  margin-top: 20px;
+  color: #a500ff;
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
 
 
 
+        #chat {
+          height: 300px;
+          overflow-y: auto;
+          background: rgba(20, 20, 20, 0.9);
+          border: 3px solid #a500ff;
+          border-radius: 10px;
+          padding: 1rem;
+          position: relative;
+          margin-bottom: 20px;
+        }
+
+        .message {
+          display: flex;
+          align-items: flex-start;
+          margin-bottom: 1rem;
+          animation: fadeIn 0.3s ease-in;
+        }
+
+        .message.self {
+          justify-content: flex-end;
+        }
+
+        .bubble {
+          max-width: 70%;
+          padding: 10px 14px;
+          border-radius: 20px;
+          background-color: #4b4b4b;
+          color: #fff;
+          position: relative;
+          font-size: 0.95rem;
+          text-align: left;
+        }
+
+        .message.self .bubble {
+          background-color: #a500ff;
+          color: #000;
+        }
+
+        .avatar {
+          width: 36px;
+          height: 36px;
+          background-color: #a500ff;
+          border-radius: 50%;
+          font-weight: bold;
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-right: 10px;
+          flex-shrink: 0;
+        }
+
+        .message.self .avatar {
+          display: none;
+        }
+
+        .timestamp {
+          font-size: 0.75rem;
+          color: #999;
+          margin-top: 4px;
+        }
+
+        #watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2.5rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.06);
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+
+
+        .form-control {
+  background-color: #1c1c1c !important; 
+  color: #00bcd4 !important;
+  border: 2px solid #a500ff;
+  border-radius: 5px;
+
+}
+
+.form-control::placeholder {
+  color: #888 !important;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #a500ff;
+  box-shadow: 0 0 8px #00bcd4;
+}
+#senderInput {
+  font-weight: bold;
+}
+
+
+       #sendMessage {
+  background-color: #a500ff;
+  color: #ffffff;
+  font-weight: bold;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-shadow: 0 0 12px #a500ff, 0 0 20px #a500ff;
+  transition: all 0.3s ease;
+}
+
+#sendMessage:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 18px #a500ff, 0 0 28px #a500ff;
+}
+
+
+        .input-group {
+          justify-content: center;
+          margin-bottom: 15px;
+          flex-wrap: wrap;
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @media (max-width: 576px) {
+          .form-control {
+            width: 100% !important;
+            margin-bottom: 10px;
+          }
+
+          #sendMessage {
+            width: 100%;
+            margin-left: 0;
+          }
+
+          .bubble {
+            font-size: 0.85rem;
+          }
+        }
+    </style>
 </head>
 <body>
 
-<div class="container mt-4">
-    <h1 class="text-center"> Real-Time Chat Application</h1>
-    <div id="chat"
-    class="border rounded p-3 mb-3"
-    style="height:300px; overflow-y: auto;">
-    </div>
+<h1>Real-Time Chat App</h1>
 
-    <div class="input-group mb-3">
-        <input id="senderInput" type="text" class="form-control"
-        placeholder="Your Name....."/>
-
-    </div>
-    <div class="input-group mb-3">
-        <input id="messageInput" type="text" class="form-control"
-               placeholder="Type Your Message....."/>
-<div id="input-group-append">
-    <button id="sendMessage" class="btn btn-primary">Send</button>
-
+<div id="chat" class="container">
+    <div id="watermark">JASWANTH CHILAKALAPUDI</div>
 </div>
-    </div>
+
+<div class="input-group">
+    <input id="senderInput" type="text" class="form-control w-25" placeholder="Your Name..." />
 </div>
-</body>
+
+<div class="input-group">
+    <input id="messageInput" type="text" class="form-control w-50" placeholder="Type your message..." />
+    <button id="sendMessage">Send</button>
+</div>
+
 <script>
-    function setConnected(connected){
-    document.getElementById('sendMessage').disabled=!connected;
-     }
-    function connect(){
-    var socket = new SockJS('/chat');
-    stompClient = Stomp.over(socket);
-    stompClient.connect({}, function(frame){
-    setConnected(true);
-    stompClient.subscribe('/topic/messages',function(message){
-    showMessage(JSON.parse(message.body));
+    let stompClient = null;
+    let currentUser = "";
 
+    function setConnected(connected) {
+      document.getElementById('sendMessage').disabled = !connected;
+    }
+
+    function connect() {
+      const socket = new SockJS('/chat');
+      stompClient = Stomp.over(socket);
+      stompClient.connect({}, function () {
+        setConnected(true);
+        stompClient.subscribe('/topic/messages', function (message) {
+          showMessage(JSON.parse(message.body));
+        });
+      });
+    }
+
+    function showMessage(message) {
+      const chat = document.getElementById('chat');
+      const messageDiv = document.createElement('div');
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      const isSelf = message.sender === currentUser;
+      messageDiv.className = `message ${isSelf ? 'self' : ''}`;
+
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+      avatar.textContent = message.sender.charAt(0).toUpperCase();
+
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.innerHTML = `<strong>${message.sender}</strong><br>${message.content}<div class="timestamp">${time}</div>`;
+
+      if (!isSelf) messageDiv.appendChild(avatar);
+      messageDiv.appendChild(bubble);
+      chat.appendChild(messageDiv);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function sendMessage() {
+      const sender = document.getElementById('senderInput').value.trim();
+      const content = document.getElementById('messageInput').value.trim();
+
+      if (sender && content) {
+        currentUser = sender;
+        const chatMessage = { sender, content };
+        stompClient.send("/app/sendMessage", {}, JSON.stringify(chatMessage));
+        document.getElementById('messageInput').value = '';
+      }
+    }
+
+    document.getElementById('sendMessage').addEventListener('click', sendMessage);
+     document.getElementById('messageInput').addEventListener('keydown', function (event) {
+      if (event.key === 'Enter') {
+        sendMessage();
+      }
     });
-});
-}
-function showMessage(message){
-var chat=document.getElementById('chat');
-var messageElement=document.createElement('div');
-messageElement.textContent=message.sender+  ' : ' +message.content;
-messageElement.class="border-bottom mb-1";
-chat.appendChild(messageElement)
-chat.scrollTop=chat.scrollHeight;
-chat.scrollTop=chat.scrollHeight;
 
-}
+    document.getElementById('senderInput').addEventListener('input', function () {
+      const name = this.value.trim();
+      document.getElementById('watermark').textContent = name || 'Your Name';
+    });
 
-function sendMessage(message){
-var sender=document.getElementById('senderInput').value;
-var content=document.getElementById('messageInput').value;
-var chatMessage={
-sender:sender,
-content:content
-}
-stompClient.send("/app/sendMessage",{},JSON.stringify(chatMessage));
-document.getElementById('messageInput').value='';
-
-}
-document.getElementById('sendMessage').addEventListener('click', sendMessage);
-  window.onload=connect;
+    window.onload = connect;
 </script>
+</body>
 </html>
+
