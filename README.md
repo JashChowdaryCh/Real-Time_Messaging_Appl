@@ -1,6 +1,6 @@
-# 💬 Real-Time Chat Application with Spring Boot & WebSocket
+# 💬 Real-Time Messagaing Application with Spring Boot & WebSocket
 
-[🔗 Live Chat URL](https://real-time-messaging-app.onrender.com/chat)
+[🔗 Real-Time Chat App](https://real-time-messaging-app.onrender.com/chat)
 
 A real-time chat application allowing multiple users to communicate simultaneously using **Spring Boot**, **WebSocket**, **STOMP**, and **SockJS**, with a clean UI powered by **Thymeleaf**, **JavaScript**, and **Bootstrap**.
 
